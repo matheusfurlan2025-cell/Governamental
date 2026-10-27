@@ -55,20 +55,20 @@ const User = mongoose.model('User', UserSchema);
 // 3.2 Ficha Cadastral Oficial da Empresa (Padrão CNPJ / Junta Comercial)
 const CompanySchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
-    razaoSocial: { type: String, default: 'Empresa Modelo Brasil LTDA' },
-    nomeFantasia: { type: String, default: 'Empresa Modelo' },
+    razaoSocial: { type: String, default: '' },
+    nomeFantasia: { type: String, default: '' },
     cnpj: { type: String, default: '' },
-    ie: { type: String, default: 'ISENTO' },
+    ie: { type: String, default: '' },
     im: { type: String, default: '' },
-    cnaePrincipal: { type: String, default: '62.01-5-01 - Desenvolvimento de programas de computador sob encomenda' },
-    naturezaJuridica: { type: String, default: '206-2 - Sociedade Empresária Limitada' },
-    regime: { type: String, default: 'MEI - Microempreendedor Individual' }, // MEI, Simples Nacional, Lucro Presumido, Lucro Real
-    porte: { type: String, default: 'ME / Microempresa' },
-    dataAbertura: { type: String, default: '2023-01-15' },
+    cnaePrincipal: { type: String, default: '' },
+    naturezaJuridica: { type: String, default: '' },
+    regime: { type: String, default: 'MEI - Microempreendedor Individual' },
+    porte: { type: String, default: '' },
+    dataAbertura: { type: String, default: '' },
     situacaoCadastral: { type: String, default: 'ATIVA' },
     cpfResponsavel: { type: String, default: '' },
     nomeResponsavel: { type: String, default: '' },
-    capital: { type: Number, default: 50000 },
+    capital: { type: Number, default: 0 },
     phone: { type: String, default: '' },
     email: { type: String, default: '' },
     website: { type: String, default: '' },
@@ -76,7 +76,7 @@ const CompanySchema = new mongoose.Schema({
     address: { type: String, default: '' },
     city: { type: String, default: '' },
     pixInfo: { type: String, default: '' },
-    quoteTerms: { type: String, default: 'Proposta emitida conforme legislação vigente. Garantia legal de 90 dias.' },
+    quoteTerms: { type: String, default: '' },
     primaryColor: { type: String, default: '#1e3a8a' },
     logoUrl: { type: String, default: '' },
     updatedAt: { type: Date, default: Date.now }
@@ -90,8 +90,8 @@ const PartnerSchema = new mongoose.Schema({
     cpf: { type: String, default: '' },
     role: { type: String, default: 'Sócio-Administrador' },
     share: { type: Number, default: 100 },
-    proLabore: { type: Number, default: 1518 },
-    inssRetido: { type: Number, default: 166.98 },
+    proLabore: { type: Number, default: 0 },
+    inssRetido: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now }
 });
 const Partner = mongoose.model('Partner', PartnerSchema);
@@ -104,9 +104,9 @@ const QuoteSchema = new mongoose.Schema({
     clientDoc: { type: String, default: '' },
     clientPhone: { type: String, default: '' },
     validUntil: { type: String, default: '' },
-    paymentTerms: { type: String, default: 'PIX à vista' },
-    deliveryTime: { type: String, default: 'Imediato' },
-    revenueNature: { type: String, default: 'SERVICO' }, // SERVICO, COMERCIO, INDUSTRIA
+    paymentTerms: { type: String, default: '' },
+    deliveryTime: { type: String, default: '' },
+    revenueNature: { type: String, default: 'SERVICO' },
     notes: { type: String, default: '' },
     items: [{
         desc: String,
@@ -127,21 +127,21 @@ const Quote = mongoose.model('Quote', QuoteSchema);
 // 3.5 Caixa Operacional, Folha de Pagamento & Rastreabilidade 100% de Renda
 const TransactionSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    traceCode: { type: String, required: true }, // Código único de rastreabilidade governamental
+    traceCode: { type: String, required: true },
     type: { type: String, enum: ['RECEITA', 'DESPESA'], required: true },
     desc: { type: String, required: true },
-    entityName: { type: String, default: '' }, // Fonte Pagadora ou Favorecido
-    entityDoc: { type: String, default: '' },  // CPF ou CNPJ obrigatório para rastreio
-    docNumber: { type: String, default: '' },  // Nº da Nota Fiscal, Recibo ou Contrato
+    entityName: { type: String, default: '' },
+    entityDoc: { type: String, default: '' },
+    docNumber: { type: String, default: '' },
     revenueNature: {
         type: String,
         enum: ['SERVICO', 'COMERCIO', 'INDUSTRIA', 'CUSTO_DEDUTIVEL', 'FOLHA_PAGAMENTO', 'DESPESA_GERAL'],
         default: 'SERVICO'
     },
-    deductible: { type: Boolean, default: true }, // Define se abate na base de cálculo do Livro Caixa
+    deductible: { type: Boolean, default: true },
     amount: { type: Number, required: true },
     date: { type: String, required: true },
-    competence: { type: String, default: '' }, // Ex: 10/2026
+    competence: { type: String, default: '' },
     status: { type: String, enum: ['PAGO', 'PENDENTE'], default: 'PAGO' },
     createdAt: { type: Date, default: Date.now }
 });
@@ -150,12 +150,12 @@ const Transaction = mongoose.model('Transaction', TransactionSchema);
 // 3.6 Módulo Exclusivo de Legalidades, Guias DAS, Impostos & Obrigações Fiscais
 const TaxLegalSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    code: { type: String, required: true }, // Ex: DAS-MEI, PGDAS-SN, DARF-IRPJ, ALVARA-MUN
+    code: { type: String, required: true },
     title: { type: String, required: true },
     kind: { type: String, enum: ['DAS_MEI', 'SIMPLES_NACIONAL', 'DARF_IMPOSTO', 'LEGALIDADE_CERTIDAO'], default: 'DAS_MEI' },
-    competence: { type: String, required: true }, // Ex: 10/2026
+    competence: { type: String, required: true },
     dueDate: { type: String, required: true },
-    baseRevenue: { type: Number, default: 0 }, // Renda rastreada que originou o cálculo
+    baseRevenue: { type: Number, default: 0 },
     deductionsApplied: { type: Number, default: 0 },
     amount: { type: Number, required: true },
     barcode: { type: String, default: '' },
@@ -179,7 +179,7 @@ const Client = mongoose.model('Client', ClientSchema);
 const CatalogSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     name: { type: String, required: true },
-    type: { type: String, default: 'SERVICO' }, // SERVICO ou COMERCIO
+    type: { type: String, default: 'SERVICO' },
     unit: { type: String, default: 'UN' },
     price: { type: Number, required: true },
     stock: { type: Number, default: 0 },
@@ -231,20 +231,23 @@ app.post('/api/auth/register', async (req, res) => {
         if (!email || !password) {
             return res.status(400).json({ error: 'E-mail e senha são obrigatórios.' });
         }
+        if (String(password).length < 6) {
+            return res.status(400).json({ error: 'A senha deve ter no mínimo 6 caracteres.' });
+        }
         const existing = await User.findOne({ email: email.toLowerCase().trim() });
         if (existing) {
             return res.status(400).json({ error: 'Este e-mail já está registrado.' });
         }
         const passwordHash = await bcrypt.hash(password, 10);
         const user = await User.create({
-            name: name || 'Representante Legal',
+            name: name || '',
             email: email.toLowerCase().trim(),
             passwordHash
         });
         await Company.create({
             userId: user._id,
-            razaoSocial: companyName || 'Minha Empresa LTDA',
-            nomeFantasia: companyName || 'Minha Empresa',
+            razaoSocial: companyName || '',
+            nomeFantasia: companyName || '',
             cnpj: cnpj || '',
             nomeResponsavel: user.name,
             email: user.email
